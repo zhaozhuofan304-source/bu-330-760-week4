@@ -43,4 +43,4 @@ The missing `product_lookup` tool was implemented in `agent.py`.
 The agent can use the calculator for math questions and the catalog lookup tool for product price questions.
 
 ## Demo Video
-PASTE_YOUR_VIDEO_LINK_HERE
+https://youtu.be/max9KiTv0uM
