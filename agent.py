@@ -1,3 +1,5 @@
+import time
+
 """Math agent that solves questions using tools in a ReAct loop."""
 
 import json
@@ -12,8 +14,7 @@ load_dotenv()
 #   "google-gla:gemini-2.5-flash"       (needs GOOGLE_API_KEY)
 #   "openai:gpt-4o-mini"                (needs OPENAI_API_KEY)
 #   "anthropic:claude-sonnet-4-6"    (needs ANTHROPIC_API_KEY)
-MODEL = "google-gla:gemini-2.5-flash"
-
+MODEL = "google-gla:gemini-2.0-flash"
 agent = Agent(
     MODEL,
     system_prompt=(
@@ -33,22 +34,18 @@ def calculator_tool(expression: str) -> str:
     """
     return calculate(expression)
 
+@agent.tool_plain
+def product_lookup(product_name: str) -> str:
+    """Look up the price of a product by name.
+    Use this when a question asks about product prices from the catalog.
+    """
+    with open("products.json", "r") as f:
+        products = json.load(f)
 
-# TODO: Implement this tool by uncommenting the code below and replacing
-# the ... with your implementation. The tool should:
-#   1. Read products.json using json.load() (json is already imported above)
-#   2. If the product_name is in the catalog, return its price as a string
-#   3. If not found, return the list of available product names so the agent
-#      can try again with the correct name
-#
-# @agent.tool_plain
-# def product_lookup(product_name: str) -> str:
-#     """Look up the price of a product by name.
-#     Use this when a question asks about product prices from the catalog.
-#     """
-#     ...
-
-
+    if product_name in products:
+        return str(products[product_name])
+    else:
+        return f"Product not found. Available products: {list(products.keys())}"
 def load_questions(path: str = "math_questions.md") -> list[str]:
     """Load numbered questions from the markdown file."""
     questions = []
@@ -59,10 +56,9 @@ def load_questions(path: str = "math_questions.md") -> list[str]:
                 questions.append(line.split(". ", 1)[1])
     return questions
 
-
 def main():
-    questions = load_questions()
-    for i, question in enumerate(questions, 1):
+    questions = load_questions()[4:]
+    for i, question in enumerate(questions, 5):
         print(f"## Question {i}")
         print(f"> {question}\n")
 
@@ -84,6 +80,7 @@ def main():
         print(f"\n**Answer:** {result.output}\n")
         print("---\n")
 
+        time.sleep(20)
 
 if __name__ == "__main__":
     main()
