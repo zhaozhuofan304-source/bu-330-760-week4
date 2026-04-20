@@ -1,5 +1,4 @@
 import time
-
 """Math agent that solves questions using tools in a ReAct loop."""
 
 import json
@@ -13,8 +12,9 @@ load_dotenv()
 # Configure your model below. Examples:
 #   "google-gla:gemini-2.5-flash"       (needs GOOGLE_API_KEY)
 #   "openai:gpt-4o-mini"                (needs OPENAI_API_KEY)
-#   "anthropic:claude-sonnet-4-6"    (needs ANTHROPIC_API_KEY)
-MODEL = "google-gla:gemini-2.0-flash"
+#   "anthropic:claude-sonnet-4-6"       (needs ANTHROPIC_API_KEY)
+MODEL = "openai:gpt-4o-mini"
+
 agent = Agent(
     MODEL,
     system_prompt=(
@@ -32,7 +32,8 @@ def calculator_tool(expression: str) -> str:
 
     Examples: "847 * 293", "10000 * (1.07 ** 5)", "23 % 4"
     """
-    return calculate(expression)
+    return str(calculate(expression))
+
 
 @agent.tool_plain
 def product_lookup(product_name: str) -> str:
@@ -42,10 +43,13 @@ def product_lookup(product_name: str) -> str:
     with open("products.json", "r") as f:
         products = json.load(f)
 
-    if product_name in products:
-        return str(products[product_name])
-    else:
-        return f"Product not found. Available products: {list(products.keys())}"
+    for name, price in products.items():
+        if name.lower() == product_name.lower():
+            return str(price)
+
+    return f"Available products: {', '.join(products.keys())}"
+
+
 def load_questions(path: str = "math_questions.md") -> list[str]:
     """Load numbered questions from the markdown file."""
     questions = []
@@ -56,9 +60,11 @@ def load_questions(path: str = "math_questions.md") -> list[str]:
                 questions.append(line.split(". ", 1)[1])
     return questions
 
+
 def main():
-    questions = load_questions()[4:]
-    for i, question in enumerate(questions, 5):
+    questions = load_questions()
+
+    for i, question in enumerate(questions, 1):
         print(f"## Question {i}")
         print(f"> {question}\n")
 
@@ -80,7 +86,8 @@ def main():
         print(f"\n**Answer:** {result.output}\n")
         print("---\n")
 
-        time.sleep(20)
+        time.sleep(1)
+
 
 if __name__ == "__main__":
     main()
