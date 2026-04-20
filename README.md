@@ -33,3 +33,14 @@ The agent will work through each question in `math_questions.md` and print the R
 - `products.json` - product catalog with prices
 - `math_questions.md` - the questions the agent solves
 - `.env.example` - template for your API key
+  
+# Math Agent with Tool Use
+This project implements a ReAct-style math agent with two tools:
+- `calculator_tool` for arithmetic
+- `product_lookup` for catalog price lookup from `products.json`
+
+The missing `product_lookup` tool was implemented in `agent.py`.  
+The agent can use the calculator for math questions and the catalog lookup tool for product price questions.
+
+## Demo Video
+PASTE_YOUR_VIDEO_LINK_HERE
